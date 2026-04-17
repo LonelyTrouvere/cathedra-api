@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import fs from 'fs';
+import fs, { createReadStream, ReadStream } from 'fs';
+import { join } from 'path';
 import { promisify } from 'util';
 
 @Injectable()
@@ -24,9 +25,7 @@ export class FileService {
     await writeFile(`${path}/${file.filename}`, file.buffer, 'utf8');
   }
 
-  public async getFile(path: string): Promise<string | Buffer> {
-    const readFile = promisify(fs.readFile);
-
-    return await readFile(path, 'utf8');
+  public getFile(path: string): ReadStream {
+    return createReadStream(join(process.cwd(), path));
   }
 }
