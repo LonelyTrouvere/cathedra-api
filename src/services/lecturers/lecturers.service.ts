@@ -2,7 +2,11 @@ import { HttpException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CreateLecturerDto } from 'src/dto/lecturers/create-lecturer.dto';
-import { LecturerDocument, ShortLecturer } from 'src/schemas/lecturer';
+import {
+  Lecturer,
+  LecturerDocument,
+  ShortLecturer,
+} from 'src/schemas/lecturer';
 
 @Injectable()
 export class LecturersService {
@@ -28,6 +32,27 @@ export class LecturersService {
           lecturer.thesisSupervisions,
           lecturer.subjects,
         ),
+    );
+  }
+
+  async getLecturerBySlug(slug: string): Promise<Lecturer> {
+    const lecturer = await this.lecturerModel.findOne({ slug }).exec();
+    if (!lecturer) {
+      throw new HttpException('Lecturer not found', 404);
+    }
+
+    return new Lecturer(
+      lecturer.name,
+      lecturer.surname,
+      lecturer.position,
+      lecturer.slug,
+      lecturer.photoUrl,
+      lecturer.middleName,
+      lecturer.titles,
+      lecturer.publications,
+      lecturer.courses,
+      lecturer.thesisSupervisions,
+      lecturer.subjects,
     );
   }
 

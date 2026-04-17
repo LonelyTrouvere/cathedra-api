@@ -3,6 +3,7 @@ import {
   Controller,
   FileTypeValidator,
   Get,
+  Param,
   ParseFilePipe,
   Post,
   UploadedFile,
@@ -24,6 +25,11 @@ export class LecturersController {
   @Get()
   async getLecturers() {
     return await this.lecturersService.getLecturers();
+  }
+
+  @Get(':slug')
+  async getLecturerBySlug(@Param('slug') slug: string) {
+    return await this.lecturersService.getLecturerBySlug(slug);
   }
 
   @Post()

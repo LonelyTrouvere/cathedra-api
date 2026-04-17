@@ -29,6 +29,8 @@ export class Lecturer extends IdentitySchema {
       thesisSupervisions: this.thesisSupervisions,
       subjects: this.subjects,
       slug: this.slug,
+      photoUrl: this.photoUrl,
+      middleName: this.middleName,
     };
   }
 }
@@ -42,6 +44,7 @@ export class ShortLecturer extends Lecturer {
       position: this.position,
       titles: this.titles,
       slug: this.slug,
+      photoUrl: this.photoUrl,
     };
   }
 }
