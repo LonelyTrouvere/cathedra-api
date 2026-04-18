@@ -2,8 +2,10 @@ import {
   Body,
   Controller,
   FileTypeValidator,
+  Get,
   ParseFilePipe,
   Post,
+  Query,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
@@ -12,6 +14,7 @@ import { CreateBookDto } from 'src/dto/create-book.dto';
 import { BooksService } from 'src/services/books/books.service';
 import { FileService } from 'src/services/file/file.service';
 import { randomUUID } from 'crypto';
+import { BookFiltersDto } from 'src/dto/book-filters';
 
 @Controller('books')
 export class BooksController {
@@ -19,6 +22,17 @@ export class BooksController {
     private readonly booksService: BooksService,
     private readonly fileService: FileService,
   ) {}
+
+  @Get()
+  async getBooks(@Query() payload: BookFiltersDto) {
+    return await this.booksService.getBooks(payload);
+  }
+
+  @Get('/total')
+  async getTotalBooks(@Query() payload: BookFiltersDto) {
+    const count = await this.booksService.getTotalBooks(payload);
+    return { total: count };
+  }
 
   @Post()
   @UseInterceptors(FileInterceptor('photo'))
