@@ -5,6 +5,7 @@ import { CreateLecturerDto } from 'src/dto/lecturers/create-lecturer.dto';
 import {
   Lecturer,
   LecturerDocument,
+  LecturerUrl,
   ShortLecturer,
 } from 'src/schemas/lecturer';
 
@@ -31,6 +32,8 @@ export class LecturersService {
           lecturer.courses,
           lecturer.thesisSupervisions,
           lecturer.subjects,
+          lecturer.personalHistory,
+          lecturer.urls,
         ),
     );
   }
@@ -53,7 +56,24 @@ export class LecturersService {
       lecturer.courses,
       lecturer.thesisSupervisions,
       lecturer.subjects,
+      lecturer.personalHistory,
+      lecturer.urls,
     );
+  }
+
+  async addUrlToLecturer(
+    lecturer: Lecturer,
+    urlData: LecturerUrl[],
+  ): Promise<void> {
+    try {
+      lecturer.urls = [...(lecturer.urls || []), ...urlData];
+      await this.lecturerModel
+        .updateOne({ slug: lecturer.slug }, { urls: lecturer.urls })
+        .exec();
+    } catch (error) {
+      console.error('Error adding URL to lecturer:', error);
+      throw error;
+    }
   }
 
   async createLecturer(

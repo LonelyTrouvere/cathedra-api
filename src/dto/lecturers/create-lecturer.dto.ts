@@ -45,4 +45,9 @@ export class CreateLecturerDto {
   @IsArray()
   @IsString({ each: true })
   subjects?: string[];
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  personalHistory?: string[];
 }

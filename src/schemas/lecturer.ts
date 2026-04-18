@@ -1,6 +1,11 @@
 import { HydratedDocument, Schema } from 'mongoose';
 import { IdentitySchema } from './identity-schema';
 
+export interface LecturerUrl {
+  name: string;
+  url: string;
+}
+
 export class Lecturer extends IdentitySchema {
   constructor(
     public name: string,
@@ -14,6 +19,8 @@ export class Lecturer extends IdentitySchema {
     public courses?: string[],
     public thesisSupervisions?: string[],
     public subjects?: string[],
+    public personalHistory?: string[],
+    public urls?: LecturerUrl[],
   ) {
     super();
   }
@@ -31,6 +38,8 @@ export class Lecturer extends IdentitySchema {
       slug: this.slug,
       photoUrl: this.photoUrl,
       middleName: this.middleName,
+      personalHistory: this.personalHistory,
+      urls: this.urls,
     };
   }
 }
@@ -64,6 +73,13 @@ export const LecturerSchema = new Schema<Lecturer>(
     subjects: { type: [String], trim: true },
     slug: { type: String, required: true, unique: true, trim: true },
     photoUrl: { type: String, required: true, trim: true },
+    personalHistory: { type: [String], trim: true },
+    urls: [
+      {
+        name: { type: String, required: true, trim: true },
+        url: { type: String, required: true, trim: true },
+      },
+    ],
   },
   {
     versionKey: false,
