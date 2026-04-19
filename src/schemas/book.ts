@@ -1,5 +1,6 @@
 import { HydratedDocument, Schema } from 'mongoose';
 import { IdentitySchema } from './identity-schema';
+import { isValidIsbn } from 'src/utility/isbn-validator';
 
 export class Book extends IdentitySchema {
   constructor(
@@ -37,7 +38,16 @@ export const BookSchema = new Schema<Book>(
     publisher: { type: String, required: true, trim: true },
     language: { type: String, required: true, trim: true },
     pages: { type: Number, required: true },
-    isbn: { type: String, required: true, unique: true, trim: true },
+    isbn: {
+      type: String,
+      required: true,
+      unique: true,
+      trim: true,
+      validate: {
+        validator: isValidIsbn,
+        message: 'Invalid ISBN format. Use a valid ISBN-10 or ISBN-13.',
+      },
+    },
     authors: { type: [String], required: true, trim: true },
     photoUrl: { type: String, required: true, trim: true },
     year: { type: Number, required: true },

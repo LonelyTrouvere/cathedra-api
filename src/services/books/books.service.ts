@@ -58,10 +58,12 @@ export class BooksService {
       const book = new this.bookModel({ ...payload, photoUrl });
       await book.save();
     } catch (error: unknown) {
+      if (error instanceof Error && error.name === 'ValidationError') {
+        throw new HttpException(error.toString(), 400);
+      }
       if (error instanceof Error && 'code' in error && error.code === 11000) {
         throw new HttpException('Book with this isbn already exists', 409);
       }
-      console.error('Error creating book:', error);
       throw error;
     }
   }
