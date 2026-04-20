@@ -18,7 +18,12 @@ export class PositionsService {
       .exec();
     return positions.map(
       (position) =>
-        new Position(position.name, position.plural, position.sortNumber),
+        new Position(
+          position.id,
+          position.name,
+          position.plural,
+          position.sortNumber,
+        ),
     );
   }
 

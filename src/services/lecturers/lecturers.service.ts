@@ -8,6 +8,7 @@ import {
   LecturerUrl,
   ShortLecturer,
 } from 'src/schemas/lecturer';
+import { Position } from 'src/schemas/position';
 
 @Injectable()
 export class LecturersService {
@@ -18,12 +19,22 @@ export class LecturersService {
 
   async getLecturers(): Promise<ShortLecturer[]> {
     const lecturers = await this.lecturerModel.find().exec();
+    await this.lecturerModel.populate(lecturers, {
+      path: 'position',
+      select: ['name', 'plural', 'sortNumber'],
+    });
+    console.log('Fetched lecturers:', lecturers);
     return lecturers.map(
       (lecturer) =>
         new ShortLecturer(
           lecturer.name,
           lecturer.surname,
-          lecturer.position,
+          new Position(
+            lecturer.position.id,
+            lecturer.position.name,
+            lecturer.position.plural,
+            lecturer.position.sortNumber,
+          ),
           lecturer.slug,
           lecturer.photoUrl,
           lecturer.middleName,
@@ -40,6 +51,11 @@ export class LecturersService {
 
   async getLecturerBySlug(slug: string): Promise<Lecturer> {
     const lecturer = await this.lecturerModel.findOne({ slug }).exec();
+    await this.lecturerModel.populate(lecturer, {
+      path: 'position',
+      select: ['name', 'plural', 'sortNumber'],
+    });
+
     if (!lecturer) {
       throw new HttpException('Lecturer not found', 404);
     }
@@ -47,7 +63,12 @@ export class LecturersService {
     return new Lecturer(
       lecturer.name,
       lecturer.surname,
-      lecturer.position,
+      new Position(
+        lecturer.position.id,
+        lecturer.position.name,
+        lecturer.position.plural,
+        lecturer.position.sortNumber,
+      ),
       lecturer.slug,
       lecturer.photoUrl,
       lecturer.middleName,
@@ -86,6 +107,9 @@ export class LecturersService {
     } catch (error: unknown) {
       if (error instanceof Error && 'code' in error && error.code === 11000) {
         throw new HttpException('Lecturer with this slug already exists', 409);
+      }
+      if (error instanceof Error && error.name === 'ValidationError') {
+        throw new HttpException(error.toString(), 400);
       }
       console.error('Error creating lecturer:', error);
       throw error;

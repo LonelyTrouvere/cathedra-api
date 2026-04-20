@@ -3,6 +3,7 @@ import { IdentitySchema } from './identity-schema';
 
 export class Position extends IdentitySchema {
   constructor(
+    public id: string,
     public name: string,
     public plural: string,
     public sortNumber: number,
@@ -12,6 +13,7 @@ export class Position extends IdentitySchema {
 
   public formatResponse(): object {
     return {
+      id: this.id,
       name: this.name,
       plural: this.plural,
       sortNumber: this.sortNumber,
