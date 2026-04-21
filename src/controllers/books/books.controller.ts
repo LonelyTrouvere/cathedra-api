@@ -3,7 +3,9 @@ import {
   Controller,
   FileTypeValidator,
   Get,
+  HttpException,
   ParseFilePipe,
+  Patch,
   Post,
   Query,
   UploadedFile,
@@ -34,10 +36,10 @@ export class BooksController {
     return { total: count };
   }
 
-  @Post()
+  @Patch('/:id/photo')
   @UseInterceptors(FileInterceptor('photo'))
-  async createBook(
-    @Body() payload: CreateBookDto,
+  async updateBookPhoto(
+    @Query('id') id: string,
     @UploadedFile(
       new ParseFilePipe({
         validators: [
@@ -49,9 +51,28 @@ export class BooksController {
   ) {
     file.filename = `${randomUUID()}.${file.mimetype.split('/')[1]}`;
     await this.fileService.createFile('uploads/books/cover', file);
-    return await this.booksService.createBook(
-      payload,
-      `uploads/books/cover/${file.filename}`,
-    );
+  }
+
+  @Post()
+  @UseInterceptors(FileInterceptor('photo'))
+  async createBook(@Body() payload: CreateBookDto) {
+    for (const author of payload.authors) {
+      if (author.lecturerId && author.name) {
+        author.lecturerId = author.lecturerId.trim();
+        throw new HttpException(
+          'Each author must have either a name or a lecturer ID, but not both.',
+          400,
+        );
+      }
+
+      if (!author.lecturerId && !author.name) {
+        throw new HttpException(
+          'Each author must have either a name or a lecturer ID.',
+          400,
+        );
+      }
+    }
+
+    return await this.booksService.createBook(payload);
   }
 }

@@ -35,27 +35,38 @@ export class BooksService {
         b.pages,
         b.isbn,
         b.authors,
-        b.photoUrl,
         b.year,
+        b.photoUrl,
       );
     const conditions = this.getFilterConditions(filters);
 
     const books = await this.bookModel
-      .find(conditions)
+      .find(conditions as any)
       .skip((filters.page - 1) * filters.limit)
       .limit(filters.limit)
       .exec();
+    for (const book of books) {
+      for (const author of book.authors) {
+        if (author.lecturerId && !author.name) {
+          await this.bookModel.populate(author, {
+            path: 'lecturerId',
+            select: ['name', 'surname', 'middleName', 'slug'],
+          });
+        }
+      }
+    }
+
     return books.map(mapCallback);
   }
 
   async getTotalBooks(filters: BookFiltersDto): Promise<number> {
     const conditions = this.getFilterConditions(filters);
-    return await this.bookModel.countDocuments(conditions).exec();
+    return await this.bookModel.countDocuments(conditions as any).exec();
   }
 
-  async createBook(payload: CreateBookDto, photoUrl: string): Promise<void> {
+  async createBook(payload: CreateBookDto): Promise<void> {
     try {
-      const book = new this.bookModel({ ...payload, photoUrl });
+      const book = new this.bookModel({ ...payload });
       await book.save();
     } catch (error: unknown) {
       if (error instanceof Error && error.name === 'ValidationError') {

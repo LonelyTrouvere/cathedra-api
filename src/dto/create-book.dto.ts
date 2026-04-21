@@ -1,4 +1,24 @@
-import { IsArray, IsNotEmpty, IsNumberString, IsString } from 'class-validator';
+import { Type } from 'class-transformer';
+import {
+  ArrayMinSize,
+  IsArray,
+  IsMongoId,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+  ValidateNested,
+} from 'class-validator';
+
+class AuthorDto {
+  @IsString()
+  @IsOptional()
+  name?: string;
+
+  @IsMongoId()
+  @IsOptional()
+  lecturerId?: string;
+}
 
 export class CreateBookDto {
   @IsString()
@@ -17,16 +37,18 @@ export class CreateBookDto {
   @IsNotEmpty()
   isbn!: string;
 
-  @IsNumberString()
+  @IsNumber()
   @IsNotEmpty()
   pages!: number;
 
-  @IsNumberString()
+  @IsNumber()
   @IsNotEmpty()
   year!: number;
 
   @IsNotEmpty()
   @IsArray()
-  @IsString({ each: true })
-  authors!: string[];
+  @ArrayMinSize(1)
+  @ValidateNested({ each: true })
+  @Type(() => AuthorDto)
+  authors!: AuthorDto[];
 }

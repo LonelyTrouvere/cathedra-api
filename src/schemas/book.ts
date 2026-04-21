@@ -9,9 +9,9 @@ export class Book extends IdentitySchema {
     public language: string,
     public pages: number,
     public isbn: string,
-    public authors: string[],
-    public photoUrl: string,
+    public authors: { name?: string; lecturerId?: string }[],
     public year: number,
+    public photoUrl?: string,
   ) {
     super();
   }
@@ -48,8 +48,21 @@ export const BookSchema = new Schema<Book>(
         message: 'Invalid ISBN format. Use a valid ISBN-10 or ISBN-13.',
       },
     },
-    authors: { type: [String], required: true, trim: true },
-    photoUrl: { type: String, required: true, trim: true },
+    authors: {
+      type: [
+        {
+          name: { type: String, required: false, trim: true },
+          lecturerId: {
+            type: Schema.Types.ObjectId,
+            ref: 'Lecturer',
+            required: false,
+            trim: true,
+          },
+        },
+      ],
+      required: true,
+    },
+    photoUrl: { type: String, required: false, trim: true },
     year: { type: Number, required: true },
   },
   {
