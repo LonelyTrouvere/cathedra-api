@@ -4,6 +4,7 @@ import {
   FileTypeValidator,
   Get,
   HttpException,
+  Param,
   ParseFilePipe,
   Patch,
   Post,
@@ -39,7 +40,7 @@ export class BooksController {
   @Patch('/:id/photo')
   @UseInterceptors(FileInterceptor('photo'))
   async updateBookPhoto(
-    @Query('id') id: string,
+    @Param('id') id: string,
     @UploadedFile(
       new ParseFilePipe({
         validators: [
@@ -49,8 +50,15 @@ export class BooksController {
     )
     file: Express.Multer.File,
   ) {
+    const book = await this.booksService.getBookById(id);
+    if (!book) {
+      throw new HttpException('Book not found', 404);
+    }
+
     file.filename = `${randomUUID()}.${file.mimetype.split('/')[1]}`;
     await this.fileService.createFile('uploads/books/cover', file);
+    const filePath = `uploads/books/cover/${file.filename}`;
+    await this.booksService.updateBook(id, { photoUrl: filePath });
   }
 
   @Post()

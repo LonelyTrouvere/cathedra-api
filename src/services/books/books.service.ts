@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { _QueryFilter, Model } from 'mongoose';
 import { BookFiltersDto } from 'src/dto/book-filters';
 import { CreateBookDto } from 'src/dto/create-book.dto';
+import { UpdateBookDTO } from 'src/dto/update-book-dto';
 import { Book, BookDocument } from 'src/schemas/book';
 
 @Injectable()
@@ -24,6 +25,11 @@ export class BooksService {
     }
 
     return conditions;
+  }
+
+  async getBookById(id: string): Promise<Book | null> {
+    const book = await this.bookModel.findById(id).exec();
+    return book;
   }
 
   async getBooks(filters: BookFiltersDto): Promise<Book[]> {
@@ -64,9 +70,14 @@ export class BooksService {
     return await this.bookModel.countDocuments(conditions as any).exec();
   }
 
+  async updateBook(id: string, data: UpdateBookDTO): Promise<void> {
+    console.log(id, data);
+    await this.bookModel.findByIdAndUpdate(id, data).exec();
+  }
+
   async createBook(payload: CreateBookDto): Promise<void> {
     try {
-      const book = new this.bookModel({ ...payload });
+      const book = new this.bookModel({ ...payload, photoUrl: null });
       await book.save();
     } catch (error: unknown) {
       if (error instanceof Error && error.name === 'ValidationError') {
