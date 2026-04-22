@@ -1,4 +1,10 @@
-import { IsArray, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import {
+  IsArray,
+  IsBoolean,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 
 export class CreateLecturerDto {
   @IsString()
@@ -16,6 +22,10 @@ export class CreateLecturerDto {
   @IsString()
   @IsNotEmpty()
   surname!: string;
+
+  @IsBoolean()
+  @IsNotEmpty()
+  active!: boolean;
 
   @IsString()
   @IsNotEmpty()

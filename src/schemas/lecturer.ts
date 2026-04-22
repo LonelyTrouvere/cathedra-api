@@ -13,6 +13,7 @@ export class Lecturer extends IdentitySchema {
     public surname: string,
     public position: Position,
     public slug: string,
+    public active: boolean,
     public photoUrl: string,
     public middleName?: string,
     public titles?: string[],
@@ -32,6 +33,7 @@ export class Lecturer extends IdentitySchema {
       surname: this.surname,
       position: this.position,
       titles: this.titles,
+      active: this.active,
       publications: this.publications,
       courses: this.courses,
       thesisSupervisions: this.thesisSupervisions,
@@ -54,6 +56,7 @@ export class ShortLecturer extends Lecturer {
       position: this.position,
       titles: this.titles,
       slug: this.slug,
+      active: this.active,
       photoUrl: this.photoUrl,
     };
   }
@@ -78,6 +81,7 @@ export const LecturerSchema = new Schema<Lecturer>(
     subjects: { type: [String], trim: true },
     slug: { type: String, required: true, unique: true, trim: true },
     photoUrl: { type: String, required: true, trim: true },
+    active: { type: Boolean, default: true, required: true },
     personalHistory: { type: [String], trim: true },
     urls: [
       {
