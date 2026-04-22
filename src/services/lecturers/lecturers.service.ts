@@ -25,6 +25,10 @@ export class LecturersService {
       query.active = filters.active === 'true';
     }
 
+    if (filters?.position !== undefined) {
+      query.position = filters.position as any;
+    }
+
     const lecturers = await this.lecturerModel.find(query as any).exec();
     await this.lecturerModel.populate(lecturers, {
       path: 'position',
