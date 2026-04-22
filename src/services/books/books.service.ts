@@ -71,7 +71,6 @@ export class BooksService {
   }
 
   async updateBook(id: string, data: UpdateBookDTO): Promise<void> {
-    console.log(id, data);
     await this.bookModel.findByIdAndUpdate(id, data).exec();
   }
 

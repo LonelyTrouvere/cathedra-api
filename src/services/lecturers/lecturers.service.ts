@@ -2,6 +2,7 @@ import { HttpException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CreateLecturerDto } from 'src/dto/lecturers/create-lecturer.dto';
+import { UpdateLecturerDTO } from 'src/dto/lecturers/update-lecturer.dto';
 import {
   Lecturer,
   LecturerDocument,
@@ -37,6 +38,7 @@ export class LecturersService {
           ),
           lecturer.slug,
           lecturer.active,
+          lecturer.id,
           lecturer.photoUrl,
           lecturer.middleName,
           lecturer.titles,
@@ -72,6 +74,7 @@ export class LecturersService {
       ),
       lecturer.slug,
       lecturer.active,
+      lecturer.id,
       lecturer.photoUrl,
       lecturer.middleName,
       lecturer.titles,
@@ -99,12 +102,13 @@ export class LecturersService {
     }
   }
 
-  async createLecturer(
-    payload: CreateLecturerDto,
-    photoUrl: string,
-  ): Promise<void> {
+  async updateLecturer(id: string, data: UpdateLecturerDTO): Promise<void> {
+    await this.lecturerModel.findByIdAndUpdate(id, data).exec();
+  }
+
+  async createLecturer(payload: CreateLecturerDto): Promise<void> {
     try {
-      const lecturer = new this.lecturerModel({ ...payload, photoUrl });
+      const lecturer = new this.lecturerModel({ ...payload });
       await lecturer.save();
     } catch (error: unknown) {
       if (error instanceof Error && 'code' in error && error.code === 11000) {
