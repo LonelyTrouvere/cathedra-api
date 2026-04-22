@@ -9,6 +9,7 @@ import {
   Patch,
   Post,
   Put,
+  Query,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
@@ -16,6 +17,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { randomUUID } from 'crypto';
 import { type Express } from 'express';
 import { CreateLecturerDto } from 'src/dto/lecturers/create-lecturer.dto';
+import { LecturersFiltersDto } from 'src/dto/lecturers/lecturers-filters.dto';
 import { type LecturerUrl } from 'src/schemas/lecturer';
 import { FileService } from 'src/services/file/file.service';
 import { LecturersService } from 'src/services/lecturers/lecturers.service';
@@ -28,8 +30,8 @@ export class LecturersController {
   ) {}
 
   @Get()
-  async getLecturers() {
-    return await this.lecturersService.getLecturers();
+  async getLecturers(@Query() payload: LecturersFiltersDto) {
+    return await this.lecturersService.getLecturers(payload);
   }
 
   @Get(':slug')
@@ -48,7 +50,7 @@ export class LecturersController {
 
   @Patch(':slug/photo')
   @UseInterceptors(FileInterceptor('photo'))
-  async updateBookPhoto(
+  async updateLecturerPhoto(
     @Param('slug') slug: string,
     @UploadedFile(
       new ParseFilePipe({

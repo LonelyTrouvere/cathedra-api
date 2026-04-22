@@ -1,7 +1,8 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { _QueryFilter, Model } from 'mongoose';
 import { CreateLecturerDto } from 'src/dto/lecturers/create-lecturer.dto';
+import { LecturersFiltersDto } from 'src/dto/lecturers/lecturers-filters.dto';
 import { UpdateLecturerDTO } from 'src/dto/lecturers/update-lecturer.dto';
 import {
   Lecturer,
@@ -18,8 +19,13 @@ export class LecturersService {
     private readonly lecturerModel: Model<LecturerDocument>,
   ) {}
 
-  async getLecturers(): Promise<ShortLecturer[]> {
-    const lecturers = await this.lecturerModel.find().exec();
+  async getLecturers(filters?: LecturersFiltersDto): Promise<ShortLecturer[]> {
+    const query: _QueryFilter<Lecturer> = {};
+    if (filters?.active !== undefined) {
+      query.active = filters.active === 'true';
+    }
+
+    const lecturers = await this.lecturerModel.find(query as any).exec();
     await this.lecturerModel.populate(lecturers, {
       path: 'position',
       select: ['name', 'plural', 'sortNumber'],
