@@ -118,7 +118,10 @@ export class LecturersService {
 
   async createLecturer(payload: CreateLecturerDto): Promise<void> {
     try {
-      const lecturer = new this.lecturerModel({ ...payload });
+      const lecturer = new this.lecturerModel({
+        ...payload,
+        photoUrl: 'assets/default-person.png',
+      });
       await lecturer.save();
     } catch (error: unknown) {
       if (error instanceof Error && 'code' in error && error.code === 11000) {
