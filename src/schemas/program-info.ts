@@ -9,7 +9,7 @@ export class ProgramInfo extends IdentitySchema {
     public name: string,
     public degree: ProgramDegree,
     public documentUrl: string,
-    public documentType: string,
+    public documentType: ProgramDocumentType,
     public startYear?: string,
     public endYear?: string,
   ) {
