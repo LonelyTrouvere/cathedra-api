@@ -12,6 +12,9 @@ import { BookSchema } from './schemas/book';
 import { PositionSchema } from './schemas/position';
 import { PositionsService } from './services/positions/positions.service';
 import { PositionsController } from './controllers/positions/positions.controller';
+import { ProgramInfoService } from './services/program-info/program-info.service';
+import { ProgramInfoSchema } from './schemas/program-info';
+import { ProgramInfoController } from './controllers/program-info/program-info.controller';
 
 @Module({
   imports: [
@@ -19,12 +22,16 @@ import { PositionsController } from './controllers/positions/positions.controlle
     MongooseModule.forFeature([{ name: 'Lecturer', schema: LecturerSchema }]),
     MongooseModule.forFeature([{ name: 'Book', schema: BookSchema }]),
     MongooseModule.forFeature([{ name: 'Position', schema: PositionSchema }]),
+    MongooseModule.forFeature([
+      { name: 'ProgramInfo', schema: ProgramInfoSchema },
+    ]),
   ],
   controllers: [
     AppController,
     LecturersController,
     BooksController,
     PositionsController,
+    ProgramInfoController,
   ],
   providers: [
     AppService,
@@ -32,6 +39,7 @@ import { PositionsController } from './controllers/positions/positions.controlle
     FileService,
     BooksService,
     PositionsService,
+    ProgramInfoService,
   ],
 })
 export class AppModule {}

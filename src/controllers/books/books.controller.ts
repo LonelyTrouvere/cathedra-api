@@ -62,7 +62,6 @@ export class BooksController {
   }
 
   @Post()
-  @UseInterceptors(FileInterceptor('photo'))
   async createBook(@Body() payload: CreateBookDto) {
     for (const author of payload.authors) {
       if (author.lecturerId && author.name) {
