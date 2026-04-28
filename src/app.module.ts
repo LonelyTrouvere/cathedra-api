@@ -15,6 +15,9 @@ import { PositionsController } from './controllers/positions/positions.controlle
 import { ProgramInfoService } from './services/program-info/program-info.service';
 import { ProgramInfoSchema } from './schemas/program-info';
 import { ProgramInfoController } from './controllers/program-info/program-info.controller';
+import { QualificationsController } from './controllers/qualifications/qualifications.controller';
+import { QualificationsService } from './services/qualifications/qualifications.service';
+import { QualificationSchema } from './schemas/qualification';
 
 @Module({
   imports: [
@@ -25,6 +28,9 @@ import { ProgramInfoController } from './controllers/program-info/program-info.c
     MongooseModule.forFeature([
       { name: 'ProgramInfo', schema: ProgramInfoSchema },
     ]),
+    MongooseModule.forFeature([
+      { name: 'Qualification', schema: QualificationSchema },
+    ]),
   ],
   controllers: [
     AppController,
@@ -32,6 +38,7 @@ import { ProgramInfoController } from './controllers/program-info/program-info.c
     BooksController,
     PositionsController,
     ProgramInfoController,
+    QualificationsController,
   ],
   providers: [
     AppService,
@@ -40,6 +47,7 @@ import { ProgramInfoController } from './controllers/program-info/program-info.c
     BooksService,
     PositionsService,
     ProgramInfoService,
+    QualificationsService,
   ],
 })
 export class AppModule {}
