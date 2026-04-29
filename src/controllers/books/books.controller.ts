@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   FileTypeValidator,
   Get,
   HttpException,
@@ -10,15 +11,18 @@ import {
   Post,
   Query,
   UploadedFile,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { ApiBody, ApiConsumes } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CreateBookDto } from 'src/dto/create-book.dto';
 import { BooksService } from 'src/services/books/books.service';
 import { FileService } from 'src/services/file/file.service';
 import { randomUUID } from 'crypto';
 import { BookFiltersDto } from 'src/dto/book-filters';
+import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
+import { UpdateBookValidator } from 'src/dto/update-book-dto';
 
 @Controller('books')
 export class BooksController {
@@ -38,6 +42,8 @@ export class BooksController {
     return { total: count };
   }
 
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {
@@ -75,6 +81,8 @@ export class BooksController {
     await this.booksService.updateBook(id, { photoUrl: filePath });
   }
 
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
   @ApiBody({ type: CreateBookDto })
   @Post()
   async createBook(@Body() payload: CreateBookDto) {
@@ -96,5 +104,40 @@ export class BooksController {
     }
 
     return await this.booksService.createBook(payload);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Patch(':id')
+  async updateBook(
+    @Param('id') id: string,
+    @Body() payload: UpdateBookValidator,
+  ) {
+    const book = await this.booksService.getBookById(id);
+    if (!book) {
+      throw new HttpException('Book not found', 404);
+    }
+
+    return await this.booksService.updateBook(id, payload);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Delete(':id')
+  async deleteBook(@Param('id') id: string) {
+    const book = await this.booksService.getBookById(id);
+    if (!book) {
+      throw new HttpException('Book not found', 404);
+    }
+
+    if (book.photoUrl) {
+      try {
+        await this.fileService.deleteFile(book.photoUrl);
+      } catch (error) {
+        console.error('Error deleting book photo:', error);
+      }
+    }
+
+    return await this.booksService.deleteBook(id);
   }
 }

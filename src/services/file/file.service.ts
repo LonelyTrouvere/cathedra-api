@@ -28,4 +28,13 @@ export class FileService {
   public getFile(path: string): ReadStream {
     return createReadStream(join(process.cwd(), path));
   }
+
+  public async deleteFile(path: string): Promise<void> {
+    if (!path.includes('uploads')) {
+      return;
+    }
+
+    const unlink = promisify(fs.unlink);
+    await unlink(path);
+  }
 }

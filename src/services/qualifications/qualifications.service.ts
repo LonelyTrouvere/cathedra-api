@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CreateQualificationDto } from 'src/dto/create-qualification.dto';
 import { FilterQualificationsDto } from 'src/dto/filter-qualifications.dto';
+import { UpdateQualificationValidator } from 'src/dto/update-qualification.dto';
 import { ProgramDegree } from 'src/schemas/program-degree';
 import {
   Qualification,
@@ -92,5 +93,16 @@ export class QualificationsService {
         },
       },
     ]);
+  }
+
+  async deleteQualification(id: string): Promise<void> {
+    await this.qualificationModel.findByIdAndDelete(id).exec();
+  }
+
+  async updateQualification(
+    id: string,
+    data: UpdateQualificationValidator,
+  ): Promise<void> {
+    await this.qualificationModel.findByIdAndUpdate(id, data).exec();
   }
 }

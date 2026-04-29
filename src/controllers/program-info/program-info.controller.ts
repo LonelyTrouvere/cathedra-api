@@ -1,20 +1,27 @@
 import {
   Body,
   Controller,
+  Delete,
   FileTypeValidator,
   Get,
+  HttpException,
+  Param,
   ParseFilePipe,
+  Patch,
   Post,
   Query,
   UploadedFile,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { ApiBody, ApiConsumes } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CreateProgramInfoDto } from 'src/dto/create-program-info.dto';
 import { ProgramFiltersDto } from 'src/dto/get-program-info';
 import { FileService } from 'src/services/file/file.service';
 import { ProgramInfoService } from 'src/services/program-info/program-info.service';
+import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
+import { UpdateProgramInfoValidator } from 'src/dto/update-program-info.dto';
 
 @Controller('program-info')
 export class ProgramInfoController {
@@ -28,6 +35,38 @@ export class ProgramInfoController {
     return await this.programInfoService.getProgramInfo(payload.degree);
   }
 
+  @Delete(':id')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  async deleteProgramInfo(@Param('id') id: string) {
+    const programInfo = await this.programInfoService.getProgramInfoById(id);
+    if (!programInfo) {
+      throw new HttpException('Program info not found', 404);
+    }
+
+    if (programInfo.documentUrl) {
+      try {
+        await this.fileService.deleteFile(programInfo.documentUrl);
+      } catch (error) {
+        console.error('Error deleting program document:', error);
+      }
+    }
+
+    return await this.programInfoService.deleteProgramInfo(id);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Patch(':id')
+  async updateProgramInfo(
+    @Param('id') id: string,
+    @Body() data: UpdateProgramInfoValidator,
+  ) {
+    await this.programInfoService.updateProgramInfo(id, data);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {
@@ -58,7 +97,7 @@ export class ProgramInfoController {
     file.filename = `${payload.name.replace(/\s+/g, '_')}_${payload.degree}_${uuid}.${file.mimetype.split('/')[1]}`;
     const documentUrl = `uploads/program/documents`;
     await this.fileService.createFile(documentUrl, file);
-    await this.programInfoService.createProgramInfo(
+    return await this.programInfoService.createProgramInfo(
       payload,
       `${documentUrl}/${file.filename}`,
     );

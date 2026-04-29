@@ -34,7 +34,6 @@ export class LecturersService {
       path: 'position',
       select: ['name', 'plural', 'sortNumber'],
     });
-    console.log('Fetched lecturers:', lecturers);
     return lecturers.map(
       (lecturer) =>
         new ShortLecturer(
@@ -64,14 +63,14 @@ export class LecturersService {
 
   async getLecturerBySlug(slug: string): Promise<Lecturer> {
     const lecturer = await this.lecturerModel.findOne({ slug }).exec();
+    if (!lecturer) {
+      throw new HttpException('Lecturer not found', 404);
+    }
+
     await this.lecturerModel.populate(lecturer, {
       path: 'position',
       select: ['name', 'plural', 'sortNumber'],
     });
-
-    if (!lecturer) {
-      throw new HttpException('Lecturer not found', 404);
-    }
 
     return new Lecturer(
       lecturer.name,
@@ -114,6 +113,10 @@ export class LecturersService {
 
   async updateLecturer(id: string, data: UpdateLecturerDTO): Promise<void> {
     await this.lecturerModel.findByIdAndUpdate(id, data).exec();
+  }
+
+  async deleteLecturer(id: string): Promise<void> {
+    await this.lecturerModel.findByIdAndDelete(id).exec();
   }
 
   async createLecturer(payload: CreateLecturerDto): Promise<void> {

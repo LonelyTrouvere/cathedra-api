@@ -1,14 +1,20 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpException,
+  Param,
+  Patch,
   Post,
   Query,
+  UseGuards,
 } from '@nestjs/common';
-import { ApiBody } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody } from '@nestjs/swagger';
 import { CreateQualificationDto } from 'src/dto/create-qualification.dto';
 import { FilterQualificationsDto } from 'src/dto/filter-qualifications.dto';
+import { UpdateQualificationValidator } from 'src/dto/update-qualification.dto';
+import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
 import { QualificationsService } from 'src/services/qualifications/qualifications.service';
 
 @Controller('qualifications')
@@ -29,6 +35,8 @@ export class QualificationsController {
     return await this.qualificationsService.getQualifications(payload);
   }
 
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
   @ApiBody({ type: CreateQualificationDto })
   @Post()
   async createQualification(@Body() payload: CreateQualificationDto) {
@@ -48,5 +56,22 @@ export class QualificationsController {
     }
 
     await this.qualificationsService.createQualification(payload);
+  }
+
+  @Delete(':id')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  async deleteQualification(@Param('id') id: string) {
+    return await this.qualificationsService.deleteQualification(id);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Patch(':id')
+  async updateQualification(
+    @Param('id') id: string,
+    @Body() data: UpdateQualificationValidator,
+  ) {
+    await this.qualificationsService.updateQualification(id, data);
   }
 }

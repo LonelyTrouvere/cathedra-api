@@ -33,17 +33,6 @@ export class BooksService {
   }
 
   async getBooks(filters: BookFiltersDto): Promise<Book[]> {
-    const mapCallback = (b: BookDocument) =>
-      new Book(
-        b.title,
-        b.publisher,
-        b.language,
-        b.pages,
-        b.isbn,
-        b.authors,
-        b.year,
-        b.photoUrl,
-      );
     const conditions = this.getFilterConditions(filters);
 
     const books = await this.bookModel
@@ -62,7 +51,7 @@ export class BooksService {
       }
     }
 
-    return books.map(mapCallback);
+    return books;
   }
 
   async getTotalBooks(filters: BookFiltersDto): Promise<number> {
@@ -74,10 +63,10 @@ export class BooksService {
     await this.bookModel.findByIdAndUpdate(id, data).exec();
   }
 
-  async createBook(payload: CreateBookDto): Promise<void> {
+  async createBook(payload: CreateBookDto) {
     try {
       const book = new this.bookModel({ ...payload, photoUrl: null });
-      await book.save();
+      return await book.save();
     } catch (error: unknown) {
       if (error instanceof Error && error.name === 'ValidationError') {
         throw new HttpException(error.toString(), 400);
@@ -87,5 +76,9 @@ export class BooksService {
       }
       throw error;
     }
+  }
+
+  async deleteBook(id: string): Promise<void> {
+    await this.bookModel.findByIdAndDelete(id).exec();
   }
 }

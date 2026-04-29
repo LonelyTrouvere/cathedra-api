@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   FileTypeValidator,
   Get,
   HttpException,
@@ -25,6 +26,7 @@ import { type LecturerUrl } from 'src/schemas/lecturer';
 import { FileService } from 'src/services/file/file.service';
 import { LecturersService } from 'src/services/lecturers/lecturers.service';
 import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
+import { UpdateLecturerValidator } from 'src/dto/lecturers/update-lecturer.dto';
 
 @Controller('lecturers')
 export class LecturersController {
@@ -43,6 +45,8 @@ export class LecturersController {
     return await this.lecturersService.getLecturerBySlug(slug);
   }
 
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
   @ApiBody({
     schema: {
       type: 'array',
@@ -69,6 +73,8 @@ export class LecturersController {
     await this.lecturersService.addUrlToLecturer(lecturer, urlData);
   }
 
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {
@@ -113,5 +119,39 @@ export class LecturersController {
   @Post()
   async createLecturer(@Body() payload: CreateLecturerDto) {
     return await this.lecturersService.createLecturer(payload);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Patch(':slug')
+  async updateLecturer(
+    @Param('slug') slug: string,
+    @Body() payload: UpdateLecturerValidator,
+  ) {
+    const lecturer = await this.lecturersService.getLecturerBySlug(slug);
+    if (!lecturer) {
+      throw new HttpException('Lecturer not found', 404);
+    }
+    return await this.lecturersService.updateLecturer(lecturer.id, payload);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Delete(':slug')
+  async deleteLecturer(@Param('slug') slug: string) {
+    const lecturer = await this.lecturersService.getLecturerBySlug(slug);
+    if (!lecturer) {
+      throw new HttpException('Lecturer not found', 404);
+    }
+
+    if (lecturer.photoUrl) {
+      try {
+        await this.fileService.deleteFile(lecturer.photoUrl);
+      } catch (error) {
+        console.error('Error deleting lecturer photo:', error);
+      }
+    }
+
+    return await this.lecturersService.deleteLecturer(lecturer.id);
   }
 }
