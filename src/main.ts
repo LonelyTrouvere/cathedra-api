@@ -37,6 +37,7 @@ async function bootstrap() {
     .setTitle('Сайт кафедри')
     .setDescription('API для сайту кафедри')
     .setVersion('1.0')
+    .addBearerAuth()
     .build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, documentFactory);

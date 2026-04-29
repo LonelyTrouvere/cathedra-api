@@ -16,10 +16,19 @@ import { ProgramInfoController } from './controllers/program-info/program-info.c
 import { QualificationsController } from './controllers/qualifications/qualifications.controller';
 import { QualificationsService } from './services/qualifications/qualifications.service';
 import { QualificationSchema } from './schemas/qualification';
+import { UsersController } from './controllers/users/users.controller';
+import { UsersService } from './services/users/users.service';
+import { UserSchema } from './schemas/user';
+import { JwtModule } from '@nestjs/jwt';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
 
 @Module({
   imports: [
     MongooseModule.forRoot('mongodb://localhost:27017/cathedra'),
+    JwtModule.register({
+      secret: process.env.JWT_SECRET ?? 'dev-secret',
+      signOptions: { expiresIn: '12h' },
+    }),
     MongooseModule.forFeature([{ name: 'Lecturer', schema: LecturerSchema }]),
     MongooseModule.forFeature([{ name: 'Book', schema: BookSchema }]),
     MongooseModule.forFeature([{ name: 'Position', schema: PositionSchema }]),
@@ -29,6 +38,7 @@ import { QualificationSchema } from './schemas/qualification';
     MongooseModule.forFeature([
       { name: 'Qualification', schema: QualificationSchema },
     ]),
+    MongooseModule.forFeature([{ name: 'User', schema: UserSchema }]),
   ],
   controllers: [
     LecturersController,
@@ -36,6 +46,7 @@ import { QualificationSchema } from './schemas/qualification';
     PositionsController,
     ProgramInfoController,
     QualificationsController,
+    UsersController,
   ],
   providers: [
     LecturersService,
@@ -44,6 +55,8 @@ import { QualificationSchema } from './schemas/qualification';
     PositionsService,
     ProgramInfoService,
     QualificationsService,
+    UsersService,
+    JwtAuthGuard,
   ],
 })
 export class AppModule {}

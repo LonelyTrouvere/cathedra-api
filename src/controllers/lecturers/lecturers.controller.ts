@@ -11,17 +11,20 @@ import {
   Put,
   Query,
   UploadedFile,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { ApiBody, ApiConsumes } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { randomUUID } from 'crypto';
 import { type Express } from 'express';
+import { ApiBearerAuth } from '@nestjs/swagger';
 import { CreateLecturerDto } from 'src/dto/lecturers/create-lecturer.dto';
 import { LecturersFiltersDto } from 'src/dto/lecturers/lecturers-filters.dto';
 import { type LecturerUrl } from 'src/schemas/lecturer';
 import { FileService } from 'src/services/file/file.service';
 import { LecturersService } from 'src/services/lecturers/lecturers.service';
+import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
 
 @Controller('lecturers')
 export class LecturersController {
@@ -105,6 +108,8 @@ export class LecturersController {
     });
   }
 
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
   @Post()
   async createLecturer(@Body() payload: CreateLecturerDto) {
     return await this.lecturersService.createLecturer(payload);
