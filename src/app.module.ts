@@ -1,6 +1,4 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { LecturersController } from './controllers/lecturers/lecturers.controller';
 import { LecturersService } from './services/lecturers/lecturers.service';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -33,7 +31,6 @@ import { QualificationSchema } from './schemas/qualification';
     ]),
   ],
   controllers: [
-    AppController,
     LecturersController,
     BooksController,
     PositionsController,
@@ -41,7 +38,6 @@ import { QualificationSchema } from './schemas/qualification';
     QualificationsController,
   ],
   providers: [
-    AppService,
     LecturersService,
     FileService,
     BooksService,
