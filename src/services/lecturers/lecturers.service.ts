@@ -10,7 +10,6 @@ import {
   LecturerUrl,
   ShortLecturer,
 } from 'src/schemas/lecturer';
-import { Position } from 'src/schemas/position';
 
 @Injectable()
 export class LecturersService {
@@ -30,21 +29,12 @@ export class LecturersService {
     }
 
     const lecturers = await this.lecturerModel.find(query as any).exec();
-    await this.lecturerModel.populate(lecturers, {
-      path: 'position',
-      select: ['name', 'plural', 'sortNumber'],
-    });
     return lecturers.map(
       (lecturer) =>
         new ShortLecturer(
           lecturer.name,
           lecturer.surname,
-          new Position(
-            lecturer.position.id,
-            lecturer.position.name,
-            lecturer.position.plural,
-            lecturer.position.sortNumber,
-          ),
+          lecturer.position,
           lecturer.slug,
           lecturer.active,
           lecturer.id,
@@ -67,20 +57,10 @@ export class LecturersService {
       throw new HttpException('Lecturer not found', 404);
     }
 
-    await this.lecturerModel.populate(lecturer, {
-      path: 'position',
-      select: ['name', 'plural', 'sortNumber'],
-    });
-
     return new Lecturer(
       lecturer.name,
       lecturer.surname,
-      new Position(
-        lecturer.position.id,
-        lecturer.position.name,
-        lecturer.position.plural,
-        lecturer.position.sortNumber,
-      ),
+      lecturer.position,
       lecturer.slug,
       lecturer.active,
       lecturer.id,

@@ -1,6 +1,6 @@
 import { HydratedDocument, Schema } from 'mongoose';
 import { IdentitySchema } from './identity-schema';
-import { Position } from './position';
+import { Positions } from './positions';
 
 export interface LecturerUrl {
   name: string;
@@ -11,7 +11,7 @@ export class Lecturer extends IdentitySchema {
   constructor(
     public name: string,
     public surname: string,
-    public position: Position,
+    public position: Positions,
     public slug: string,
     public active: boolean,
     public id: string,
@@ -73,8 +73,8 @@ export const LecturerSchema = new Schema<Lecturer>(
     middleName: { type: String, trim: true },
     surname: { type: String, required: true, trim: true },
     position: {
-      type: Schema.Types.ObjectId,
-      ref: 'Position',
+      type: String,
+      enum: Object.values(Positions),
       required: true,
     },
     titles: { type: [String], trim: true },

@@ -27,6 +27,7 @@ import { FileService } from 'src/services/file/file.service';
 import { LecturersService } from 'src/services/lecturers/lecturers.service';
 import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
 import { UpdateLecturerValidator } from 'src/dto/lecturers/update-lecturer.dto';
+import { Positions } from 'src/schemas/positions';
 
 @Controller('lecturers')
 export class LecturersController {
@@ -34,6 +35,11 @@ export class LecturersController {
     private readonly lecturersService: LecturersService,
     private readonly fileService: FileService,
   ) {}
+
+  @Get('/positions')
+  getLecturerPositions() {
+    return Object.values(Positions);
+  }
 
   @Get()
   async getLecturers(@Query() payload: LecturersFiltersDto) {

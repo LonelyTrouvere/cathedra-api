@@ -1,11 +1,13 @@
 import {
   IsArray,
   IsBoolean,
+  IsEnum,
   IsNotEmpty,
   IsOptional,
   IsString,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Positions } from 'src/schemas/positions';
 
 export class CreateLecturerDto {
   @ApiProperty({ example: 'Ada' })
@@ -33,9 +35,9 @@ export class CreateLecturerDto {
   @IsNotEmpty()
   active!: boolean;
 
-  @ApiProperty({ example: '66c7f9f1b2e4a7b8c9d01234' })
-  @IsString()
+  @ApiProperty({ enum: Positions, example: Positions.PROFESSOR })
   @IsNotEmpty()
+  @IsEnum(Positions)
   position!: string;
 
   @ApiPropertyOptional({ example: ['PhD', 'MSc'] })
@@ -68,7 +70,9 @@ export class CreateLecturerDto {
   @IsString({ each: true })
   subjects?: string[];
 
-  @ApiPropertyOptional({ example: ['Born in London', 'Worked at Babbage Institute'] })
+  @ApiPropertyOptional({
+    example: ['Born in London', 'Worked at Babbage Institute'],
+  })
   @IsOptional()
   @IsArray()
   @IsString({ each: true })
