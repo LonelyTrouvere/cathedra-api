@@ -22,6 +22,8 @@ import { FileService } from 'src/services/file/file.service';
 import { ProgramInfoService } from 'src/services/program-info/program-info.service';
 import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
 import { UpdateProgramInfoValidator } from 'src/dto/update-program-info.dto';
+import { ProgramDegree } from 'src/schemas/program-degree';
+import { ProgramDocumentType } from 'src/schemas/program-document-types';
 
 @Controller('program-info')
 export class ProgramInfoController {
@@ -29,6 +31,16 @@ export class ProgramInfoController {
     private readonly programInfoService: ProgramInfoService,
     private readonly fileService: FileService,
   ) {}
+
+  @Get('degrees')
+  getProgramDegrees() {
+    return Object.values(ProgramDegree);
+  }
+
+  @Get('doctypes')
+  getProgramDocumentTypes() {
+    return Object.values(ProgramDocumentType);
+  }
 
   @Get()
   async getBooks(@Query() payload: ProgramFiltersDto) {
