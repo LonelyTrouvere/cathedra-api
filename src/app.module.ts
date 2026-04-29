@@ -18,10 +18,14 @@ import { UsersService } from './services/users/users.service';
 import { UserSchema } from './schemas/user';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
-    MongooseModule.forRoot('mongodb://localhost:27017/cathedra'),
+    ConfigModule.forRoot(),
+    MongooseModule.forRoot(
+      process.env.MONGODB_URI ?? 'mongodb://localhost:27017/cathedra',
+    ),
     JwtModule.register({
       secret: process.env.JWT_SECRET ?? 'dev-secret',
       signOptions: { expiresIn: '12h' },

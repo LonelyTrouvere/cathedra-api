@@ -16,12 +16,14 @@ async function bootstrap() {
     prefix: '/assets',
   });
 
-  app.enableCors({
-    origin: ['http://localhost:4200'],
-    methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: true,
-  });
+  if (process.env.NODE_ENV === 'local') {
+    app.enableCors({
+      origin: ['http://localhost:4200'],
+      methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'],
+      allowedHeaders: ['Content-Type', 'Authorization'],
+      credentials: true,
+    });
+  }
 
   app.useGlobalPipes(
     new ValidationPipe({
@@ -39,7 +41,6 @@ async function bootstrap() {
     .build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, documentFactory);
-
   await app.listen(process.env.PORT ?? 3000);
 }
 void bootstrap();
