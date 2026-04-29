@@ -6,6 +6,7 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
+import { ApiBody } from '@nestjs/swagger';
 import { CreateQualificationDto } from 'src/dto/create-qualification.dto';
 import { FilterQualificationsDto } from 'src/dto/filter-qualifications.dto';
 import { QualificationsService } from 'src/services/qualifications/qualifications.service';
@@ -28,6 +29,7 @@ export class QualificationsController {
     return await this.qualificationsService.getQualifications(payload);
   }
 
+  @ApiBody({ type: CreateQualificationDto })
   @Post()
   async createQualification(@Body() payload: CreateQualificationDto) {
     if (payload.supervisor.name && payload.supervisor.lecturerId) {

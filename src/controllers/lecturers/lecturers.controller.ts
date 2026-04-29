@@ -13,6 +13,7 @@ import {
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
+import { ApiBody, ApiConsumes } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { randomUUID } from 'crypto';
 import { type Express } from 'express';
@@ -39,6 +40,23 @@ export class LecturersController {
     return await this.lecturersService.getLecturerBySlug(slug);
   }
 
+  @ApiBody({
+    schema: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          name: { type: 'string', example: 'Personal website' },
+          url: { type: 'string', example: 'https://example.com' },
+        },
+        required: ['name', 'url'],
+      },
+      example: [
+        { name: 'Personal website', url: 'https://example.com' },
+        { name: 'Google Scholar', url: 'https://scholar.google.com' },
+      ],
+    },
+  })
   @Put(':slug/url')
   async addUrlToLecturer(
     @Param('slug') slug: string,
@@ -48,6 +66,19 @@ export class LecturersController {
     await this.lecturersService.addUrlToLecturer(lecturer, urlData);
   }
 
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        photo: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+      required: ['photo'],
+    },
+  })
   @Patch(':slug/photo')
   @UseInterceptors(FileInterceptor('photo'))
   async updateLecturerPhoto(

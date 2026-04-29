@@ -9,6 +9,7 @@ import {
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
+import { ApiBody, ApiConsumes } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CreateProgramInfoDto } from 'src/dto/create-program-info.dto';
 import { ProgramFiltersDto } from 'src/dto/get-program-info';
@@ -27,6 +28,21 @@ export class ProgramInfoController {
     return await this.programInfoService.getProgramInfo(payload.degree);
   }
 
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        name: { type: 'string', example: 'Computer Science' },
+        degree: { type: 'string', example: 'Bachelor' },
+        documentType: { type: 'string', example: 'Syllabus' },
+        startYear: { type: 'string', example: '2024' },
+        endYear: { type: 'string', example: '2028' },
+        document: { type: 'string', format: 'binary' },
+      },
+      required: ['name', 'degree', 'documentType', 'document'],
+    },
+  })
   @Post()
   @UseInterceptors(FileInterceptor('document'))
   async createProgramInfo(

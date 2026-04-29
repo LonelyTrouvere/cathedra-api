@@ -4,9 +4,11 @@ import { join } from 'path';
 import { AppModule } from './app.module';
 import { ResponseFormatterInterceptor } from './interceptors/response-formatter.interceptor';
 import { ValidationPipe } from '@nestjs/common';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
+
   app.set('etag', false);
   app.useStaticAssets(join(process.cwd(), 'uploads'), {
     prefix: '/uploads',
@@ -14,12 +16,14 @@ async function bootstrap() {
   app.useStaticAssets(join(process.cwd(), 'assets'), {
     prefix: '/assets',
   });
+
   app.enableCors({
     origin: ['http://localhost:4200'],
     methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
   });
+
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -28,6 +32,15 @@ async function bootstrap() {
     }),
   );
   app.useGlobalInterceptors(new ResponseFormatterInterceptor());
+
+  const config = new DocumentBuilder()
+    .setTitle('Сайт кафедри')
+    .setDescription('API для сайту кафедри')
+    .setVersion('1.0')
+    .build();
+  const documentFactory = () => SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('docs', app, documentFactory);
+
   await app.listen(process.env.PORT ?? 3000);
 }
 void bootstrap();

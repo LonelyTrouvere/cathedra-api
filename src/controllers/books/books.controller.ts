@@ -12,6 +12,7 @@ import {
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
+import { ApiBody, ApiConsumes } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CreateBookDto } from 'src/dto/create-book.dto';
 import { BooksService } from 'src/services/books/books.service';
@@ -37,6 +38,19 @@ export class BooksController {
     return { total: count };
   }
 
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        photo: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+      required: ['photo'],
+    },
+  })
   @Patch('/:id/photo')
   @UseInterceptors(FileInterceptor('photo'))
   async updateBookPhoto(
@@ -61,6 +75,7 @@ export class BooksController {
     await this.booksService.updateBook(id, { photoUrl: filePath });
   }
 
+  @ApiBody({ type: CreateBookDto })
   @Post()
   async createBook(@Body() payload: CreateBookDto) {
     for (const author of payload.authors) {
