@@ -12,6 +12,7 @@ export class Book extends IdentitySchema {
     public authors: { name?: string; lecturerId?: string }[],
     public year: number,
     public photoUrl?: string,
+    public documentUrl?: string,
   ) {
     super();
   }
@@ -26,6 +27,7 @@ export class Book extends IdentitySchema {
       authors: this.authors,
       photoUrl: this.photoUrl,
       year: this.year,
+      documentUrl: this.documentUrl,
     };
   }
 }
@@ -64,6 +66,7 @@ export const BookSchema = new Schema<Book>(
     },
     photoUrl: { type: String, required: false, trim: true },
     year: { type: Number, required: true },
+    documentUrl: { type: String, required: false, trim: true },
   },
   {
     versionKey: false,

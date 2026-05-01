@@ -75,10 +75,63 @@ export class BooksController {
       throw new HttpException('Book not found', 404);
     }
 
+    if (book.photoUrl) {
+      try {
+        await this.fileService.deleteFile(book.photoUrl);
+      } catch (error) {
+        console.error('Error deleting book photo:', error);
+      }
+    }
+
     file.filename = `${randomUUID()}.${file.mimetype.split('/')[1]}`;
     await this.fileService.createFile('uploads/books/cover', file);
     const filePath = `uploads/books/cover/${file.filename}`;
     await this.booksService.updateBook(id, { photoUrl: filePath });
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        document: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+      required: ['document'],
+    },
+  })
+  @Patch('/:id/document')
+  @UseInterceptors(FileInterceptor('document'))
+  async updateBookDocument(
+    @Param('id') id: string,
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [new FileTypeValidator({ fileType: 'application/pdf' })],
+      }),
+    )
+    file: Express.Multer.File,
+  ) {
+    const book = await this.booksService.getBookById(id);
+    if (!book) {
+      throw new HttpException('Book not found', 404);
+    }
+
+    if (book.documentUrl) {
+      try {
+        await this.fileService.deleteFile(book.documentUrl);
+      } catch (error) {
+        console.error('Error deleting book document:', error);
+      }
+    }
+
+    file.filename = `${randomUUID()}.${file.mimetype.split('/')[1]}`;
+    await this.fileService.createFile('uploads/books/content', file);
+    const filePath = `uploads/books/content/${file.filename}`;
+    await this.booksService.updateBook(id, { documentUrl: filePath });
   }
 
   @ApiBearerAuth()
@@ -135,6 +188,14 @@ export class BooksController {
         await this.fileService.deleteFile(book.photoUrl);
       } catch (error) {
         console.error('Error deleting book photo:', error);
+      }
+    }
+
+    if (book.documentUrl) {
+      try {
+        await this.fileService.deleteFile(book.documentUrl);
+      } catch (error) {
+        console.error('Error deleting book document:', error);
       }
     }
 
