@@ -18,17 +18,30 @@ import { UsersService } from './services/users/users.service';
 import { UserSchema } from './schemas/user';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
     ConfigModule.forRoot(),
-    MongooseModule.forRoot(
-      process.env.MONGODB_URI ?? 'mongodb://localhost:27017/cathedra',
-    ),
-    JwtModule.register({
-      secret: process.env.JWT_SECRET ?? 'dev-secret',
-      signOptions: { expiresIn: '12h' },
+    MongooseModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService) => {
+        console.log('MongoDB URI:', configService.get<string>('MONGODB_URI'));
+        return {
+          uri: configService.get<string>('MONGODB_URI'),
+        };
+      },
+      inject: [ConfigService],
+    }),
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService) => {
+        return {
+          secret: configService.get<string>('JWT_SECRET'),
+          signOptions: { expiresIn: '12h' },
+        };
+      },
+      inject: [ConfigService],
     }),
     MongooseModule.forFeature([{ name: 'Lecturer', schema: LecturerSchema }]),
     MongooseModule.forFeature([{ name: 'Book', schema: BookSchema }]),
