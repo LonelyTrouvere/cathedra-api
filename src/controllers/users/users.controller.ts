@@ -1,5 +1,5 @@
 import { Body, Controller, Post } from '@nestjs/common';
-import { ApiBody, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { LoginUserDto } from 'src/dto/login-user.dto';
 import { UsersService } from 'src/services/users/users.service';
 
@@ -8,6 +8,10 @@ import { UsersService } from 'src/services/users/users.service';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  @ApiOperation({
+    summary: 'Авторизація користувача',
+    description: 'Повртає JWT токен для авторизації у захищених маршрутах.',
+  })
   @ApiBody({ type: LoginUserDto })
   @Post('login')
   async login(@Body() payload: LoginUserDto) {

@@ -14,7 +14,12 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiBody, ApiConsumes } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiConsumes,
+  ApiOperation,
+} from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CreateProgramInfoDto } from 'src/dto/create-program-info.dto';
 import { ProgramFiltersDto } from 'src/dto/get-program-info';
@@ -32,21 +37,40 @@ export class ProgramInfoController {
     private readonly fileService: FileService,
   ) {}
 
+  @ApiOperation({
+    summary: 'Отримати ступені навчання',
+  })
   @Get('degrees')
   getProgramDegrees() {
     return Object.values(ProgramDegree);
   }
 
+  @ApiOperation({
+    summary: 'Отримати типи документів',
+    description: `
+      Syllabus - навчильний план
+      Program - Програми навчальних дисциплін
+      Curriculum - Опис освітньої програми
+    `,
+  })
   @Get('doctypes')
   getProgramDocumentTypes() {
     return Object.values(ProgramDocumentType);
   }
 
+  @ApiOperation({
+    summary: 'Отримати документи',
+    description:
+      'Повертає список нормативних документів для заданого ступеня навчання.',
+  })
   @Get()
-  async getBooks(@Query() payload: ProgramFiltersDto) {
+  async getProgramInfos(@Query() payload: ProgramFiltersDto) {
     return await this.programInfoService.getProgramInfo(payload.degree);
   }
 
+  @ApiOperation({
+    summary: 'Видалити документ',
+  })
   @Delete(':id')
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
@@ -67,6 +91,9 @@ export class ProgramInfoController {
     return await this.programInfoService.deleteProgramInfo(id);
   }
 
+  @ApiOperation({
+    summary: 'Оновити документ',
+  })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Patch(':id')
@@ -77,6 +104,9 @@ export class ProgramInfoController {
     await this.programInfoService.updateProgramInfo(id, data);
   }
 
+  @ApiOperation({
+    summary: 'Створити новий документ',
+  })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @ApiConsumes('multipart/form-data')

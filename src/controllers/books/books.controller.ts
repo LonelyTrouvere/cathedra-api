@@ -14,7 +14,12 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiBody, ApiConsumes } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiConsumes,
+  ApiOperation,
+} from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CreateBookDto } from 'src/dto/create-book.dto';
 import { BooksService } from 'src/services/books/books.service';
@@ -31,17 +36,28 @@ export class BooksController {
     private readonly fileService: FileService,
   ) {}
 
+  @ApiOperation({
+    summary: 'Отримати список книг',
+  })
   @Get()
   async getBooks(@Query() payload: BookFiltersDto) {
     return await this.booksService.getBooks(payload);
   }
 
+  @ApiOperation({
+    summary: 'Отримати кількість книг',
+    description:
+      'Повертає загальну кількість книг, що відповідають заданим фільтрам. Корисно для пагінації.',
+  })
   @Get('/total')
   async getTotalBooks(@Query() payload: BookFiltersDto) {
     const count = await this.booksService.getTotalBooks(payload);
     return { total: count };
   }
 
+  @ApiOperation({
+    summary: 'Оновити фотографію книги',
+  })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @ApiConsumes('multipart/form-data')
@@ -89,6 +105,10 @@ export class BooksController {
     await this.booksService.updateBook(id, { photoUrl: filePath });
   }
 
+  @ApiOperation({
+    summary: 'Оновити зміст книги',
+    description: 'Дає користувачеві доступ до власне вмісту книги.',
+  })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @ApiConsumes('multipart/form-data')
@@ -134,6 +154,9 @@ export class BooksController {
     await this.booksService.updateBook(id, { documentUrl: filePath });
   }
 
+  @ApiOperation({
+    summary: 'Створити нову книгу',
+  })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @ApiBody({ type: CreateBookDto })
@@ -159,6 +182,9 @@ export class BooksController {
     return await this.booksService.createBook(payload);
   }
 
+  @ApiOperation({
+    summary: 'Оновити книгу',
+  })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Patch(':id')
@@ -174,6 +200,9 @@ export class BooksController {
     return await this.booksService.updateBook(id, payload);
   }
 
+  @ApiOperation({
+    summary: 'Видалити книгу',
+  })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Delete(':id')

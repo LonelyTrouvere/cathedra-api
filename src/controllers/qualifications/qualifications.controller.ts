@@ -10,7 +10,7 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiBody } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiOperation } from '@nestjs/swagger';
 import { CreateQualificationDto } from 'src/dto/create-qualification.dto';
 import { FilterQualificationsDto } from 'src/dto/filter-qualifications.dto';
 import { UpdateQualificationValidator } from 'src/dto/update-qualification.dto';
@@ -23,6 +23,9 @@ export class QualificationsController {
     protected readonly qualificationsService: QualificationsService,
   ) {}
 
+  @ApiOperation({
+    summary: 'Отримати роки захисту',
+  })
   @Get('/years')
   async getQualificationYears(@Query() payload: FilterQualificationsDto) {
     return await this.qualificationsService.getQualificationYears(
@@ -30,11 +33,17 @@ export class QualificationsController {
     );
   }
 
+  @ApiOperation({
+    summary: 'Отримати список дипломних робіт',
+  })
   @Get()
   async getQualifications(@Query() payload: FilterQualificationsDto) {
     return await this.qualificationsService.getQualifications(payload);
   }
 
+  @ApiOperation({
+    summary: 'Створити роботу',
+  })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @ApiBody({ type: CreateQualificationDto })
@@ -58,6 +67,9 @@ export class QualificationsController {
     await this.qualificationsService.createQualification(payload);
   }
 
+  @ApiOperation({
+    summary: 'Видалити роботу',
+  })
   @Delete(':id')
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
@@ -65,6 +77,9 @@ export class QualificationsController {
     return await this.qualificationsService.deleteQualification(id);
   }
 
+  @ApiOperation({
+    summary: 'Оновити роботу',
+  })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Patch(':id')

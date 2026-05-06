@@ -15,7 +15,7 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { ApiBody, ApiConsumes } from '@nestjs/swagger';
+import { ApiBody, ApiConsumes, ApiOperation } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { randomUUID } from 'crypto';
 import { type Express } from 'express';
@@ -36,21 +36,37 @@ export class LecturersController {
     private readonly fileService: FileService,
   ) {}
 
+  @ApiOperation({
+    summary: 'Отримати можливі посади',
+    description: 'Повертає список можливих посад для викладачів.',
+  })
   @Get('/positions')
   getLecturerPositions() {
     return Object.values(Positions);
   }
 
+  @ApiOperation({
+    summary: 'Отримати список викладачів',
+  })
   @Get()
   async getLecturers(@Query() payload: LecturersFiltersDto) {
     return await this.lecturersService.getLecturers(payload);
   }
 
+  @ApiOperation({
+    summary: 'Отримати інформацію про викладача',
+    description: 'Повертає детальну інформацію про викладача за його slug.',
+  })
   @Get(':slug')
   async getLecturerBySlug(@Param('slug') slug: string) {
     return await this.lecturersService.getLecturerBySlug(slug);
   }
 
+  @ApiOperation({
+    summary: 'Додати URL до викладача',
+    description:
+      'Додає викладачеві посилання на зовнішні ресурси, такі як особистий сайт або профіль у Google Scholar.',
+  })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @ApiBody({
@@ -79,6 +95,9 @@ export class LecturersController {
     await this.lecturersService.addUrlToLecturer(lecturer, urlData);
   }
 
+  @ApiOperation({
+    summary: 'Оновити фотографію викладача',
+  })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @ApiConsumes('multipart/form-data')
@@ -120,6 +139,9 @@ export class LecturersController {
     });
   }
 
+  @ApiOperation({
+    summary: 'Створити нового викладача',
+  })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Post()
@@ -127,6 +149,9 @@ export class LecturersController {
     return await this.lecturersService.createLecturer(payload);
   }
 
+  @ApiOperation({
+    summary: 'Оновити інформацію про викладача',
+  })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Patch(':slug')
@@ -141,6 +166,9 @@ export class LecturersController {
     return await this.lecturersService.updateLecturer(lecturer.id, payload);
   }
 
+  @ApiOperation({
+    summary: 'Видалити викладача',
+  })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Delete(':slug')
