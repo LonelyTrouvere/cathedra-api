@@ -117,4 +117,18 @@ export class LecturersService {
       throw error;
     }
   }
+
+  async getLecturersByPositionCount(): Promise<Record<string, number>> {
+    const result = await this.lecturerModel.aggregate([
+      { $group: { _id: '$position', count: { $sum: 1 } } },
+    ]);
+
+    return result.reduce(
+      (acc, item) => {
+        acc[item._id] = item.count;
+        return acc;
+      },
+      {} as Record<string, number>,
+    );
+  }
 }

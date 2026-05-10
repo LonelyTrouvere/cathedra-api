@@ -54,6 +54,15 @@ export class LecturersController {
   }
 
   @ApiOperation({
+    summary: 'Отримати кількість викладачів за посадами',
+    description: 'Повертає розподіл кількості викладачів по посадам.',
+  })
+  @Get('stats/by-position')
+  async getLecturersByPositionCount() {
+    return await this.lecturersService.getLecturersByPositionCount();
+  }
+
+  @ApiOperation({
     summary: 'Отримати інформацію про викладача',
     description: 'Повертає детальну інформацію про викладача за його slug.',
   })
